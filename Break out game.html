@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Talha - Breakout Game</title>
+  <link rel="icon" href="https://i.ibb.co/M6KTWnf/pic.jpg">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: white;
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 20px;
+      font-size: 2rem;
+      color: #00e676;
+    }
+
+    canvas {
+      display: block;
+      margin: 20px auto;
+      background: #000;
+      border: 2px solid #00e676;
+    }
+
+    .btn {
+      background: #00e676;
+      border: none;
+      padding: 10px 20px;
+      margin: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .rules {
+      background: #333;
+      color: white;
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+      margin: 10px auto;
+      border-radius: 10px;
+      display: none;
+    }
+
+    .arrow-controls {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 40px;
+      z-index: 1000;
+    }
+
+    .arrow-btn {
+      background: #222;
+      border: 2px solid #00e676;
+      color: white;
+      font-size: 2rem;
+      border-radius: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .arrow-btn:hover {
+      background: #00e676;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Breakout!</h1>
+  <button id="rules-btn" class="btn rules-btn">Show Rules</button>
+  <div id="rules" class="rules">
+    <h2>How To Play:</h2>
+    <p>Use the on-screen arrows or keyboard Left/Right keys to move the paddle.</p>
+    <p>Keep the ball bouncing to break the blocks. Missing the ball resets the score.</p>
+    <button id="close-btn" class="btn">Close</button>
+  </div>
+
+  <canvas id="canvas" width="480" height="320"></canvas>
+
+  <div class="arrow-controls">
+    <button id="left-arrow" class="arrow-btn">⬅️</button>
+    <button id="right-arrow" class="arrow-btn">➡️</button>
+  </div>
+
+  <script>
+    const rulesBtn = document.getElementById('rules-btn');
+    const closeBtn = document.getElementById('close-btn');
+    const rules = document.getElementById('rules');
+
+    rulesBtn.addEventListener('click', () => rules.style.display = 'block');
+    closeBtn.addEventListener('click', () => rules.style.display = 'none');
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const paddle = {
+      x: canvas.width / 2 - 40,
+      y: canvas.height - 20,
+      width: 80,
+      height: 10,
+      speed: 6,
+      dx: 0
+    };
+
+    const ball = {
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      size: 8,
+      speed: 4,
+      dx: 4,
+      dy: -4
+    };
+
+    const brickRowCount = 3;
+    const brickColumnCount = 5;
+    const brickWidth = 70;
+    const brickHeight = 20;
+    const brickPadding = 10;
+    const brickOffsetTop = 30;
+    const brickOffsetLeft = 35;
+
+    let bricks = [];
+    for (let c = 0; c < brickColumnCount; c++) {
+      bricks[c] = [];
+      for (let r = 0; r < brickRowCount; r++) {
+        bricks[c][r] = { x: 0, y: 0, visible: true };
+      }
+    }
+
+    let score = 0;
+
+    function drawPaddle() {
+      ctx.fillStyle = '#00e676';
+      ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+    }
+
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.size, 0, Math.PI * 2);
+      ctx.fillStyle = '#00e676';
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function drawBricks() {
+      bricks.forEach((col, cIndex) => {
+        col.forEach((brick, rIndex) => {
+          if (brick.visible) {
+            const x = cIndex * (brickWidth + brickPadding) + brickOffsetLeft;
+            const y = rIndex * (brickHeight + brickPadding) + brickOffsetTop;
+            brick.x = x;
+            brick.y = y;
+            ctx.fillStyle = '#00e676';
+            ctx.fillRect(x, y, brickWidth, brickHeight);
+          }
+        });
+      });
+    }
+
+    function drawScore() {
+      ctx.font = '16px Arial';
+      ctx.fillStyle = '#fff';
+      ctx.fillText(`Score: ${score}`, 8, 20);
+    }
+
+    function movePaddle() {
+      paddle.x += paddle.dx;
+
+      if (paddle.x < 0) paddle.x = 0;
+      if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
+    }
+
+    function moveBall() {
+      ball.x += ball.dx;
+      ball.y += ball.dy;
+
+      // Wall collision
+      if (ball.x + ball.size > canvas.width || ball.x - ball.size < 0) ball.dx *= -1;
+      if (ball.y - ball.size < 0) ball.dy *= -1;
+
+      // Paddle collision
+      if (
+        ball.x > paddle.x &&
+        ball.x < paddle.x + paddle.width &&
+        ball.y + ball.size > paddle.y
+      ) {
+        ball.dy = -ball.speed;
+      }
+
+      // Brick collision
+      bricks.forEach(col => {
+        col.forEach(brick => {
+          if (brick.visible) {
+            if (
+              ball.x > brick.x &&
+              ball.x < brick.x + brickWidth &&
+              ball.y > brick.y &&
+              ball.y < brick.y + brickHeight
+            ) {
+              ball.dy *= -1;
+              brick.visible = false;
+              score += 1;
+
+              // Reset all bricks if cleared
+              if (score === brickRowCount * brickColumnCount) {
+                showAllBricks();
+                score = 0;
+              }
+            }
+          }
+        });
+      });
+
+      // Missed ball
+      if (ball.y + ball.size > canvas.height) {
+        showAllBricks();
+        score = 0;
+      }
+    }
+
+    function showAllBricks() {
+      bricks.forEach(col => col.forEach(brick => brick.visible = true));
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawPaddle();
+      drawBall();
+      drawBricks();
+      drawScore();
+    }
+
+    function update() {
+      movePaddle();
+      moveBall();
+      draw();
+      requestAnimationFrame(update);
+    }
+
+    update();
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Right' || e.key === 'ArrowRight') paddle.dx = paddle.speed;
+      if (e.key === 'Left' || e.key === 'ArrowLeft') paddle.dx = -paddle.speed;
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'Right' || e.key === 'ArrowRight' || e.key === 'Left' || e.key === 'ArrowLeft') {
+        paddle.dx = 0;
+      }
+    });
+
+    // Arrow button controls
+    const leftArrow = document.getElementById('left-arrow');
+    const rightArrow = document.getElementById('right-arrow');
+
+    leftArrow.addEventListener('mousedown', () => paddle.dx = -paddle.speed);
+    rightArrow.addEventListener('mousedown', () => paddle.dx = paddle.speed);
+
+    document.addEventListener('mouseup', () => paddle.dx = 0);
+
+    leftArrow.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      paddle.dx = -paddle.speed;
+    });
+    rightArrow.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      paddle.dx = paddle.speed;
+    });
+    leftArrow.addEventListener('touchend', () => paddle.dx = 0);
+    rightArrow.addEventListener('touchend', () => paddle.dx = 0);
+  </script>
+</body>
+</html>
