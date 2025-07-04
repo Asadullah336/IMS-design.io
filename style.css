@@ -1,0 +1,178 @@
+ body {
+    font-family: Arial, sans-serif;
+    background: #f7f9fc;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 40px auto;
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  }
+  h1, h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  form > div {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  form input, form select {
+    padding: 10px;
+    font-size: 16px;
+  }
+  #date {
+    flex: 1 1 150px;
+  }
+  #item {
+    flex: 1 1 150px;
+  }
+  #quantity {
+    flex: 1 1 80px;
+  }
+  #unit {
+    flex: 1 1 100px;
+  }
+  #amount {
+    flex: 1 1 100px;
+  }
+  form button {
+    width: 1100px;
+    background: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 16px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+  th, td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+  }
+  thead {
+    background-color: #007bff;
+    color: white;
+  }
+  .actions button {
+    margin: 0 5px;
+    padding: 5px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .edit {
+    background-color: #ffc107;
+  }
+  .delete {
+    background-color: #dc3545;
+    color: white;
+  }
+  .total, .monthly-report {
+    font-weight: bold;
+    margin-top: 20px;
+    text-align: right;
+  }
+  #chartContainer {
+    margin-top: 30px;
+  }
+  #logoutBtn {
+    float: right;
+    background: #dc3545;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  /* Login styles */
+  #loginPage {
+    max-width: 400px;
+    margin: 80px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.15);
+    position: relative;
+  }
+  #loginPage h2 {
+    margin-bottom: 25px;
+  }
+  #loginPage input {
+    width: 100%;
+    padding: 12px 40px 12px 12px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+  }
+  #loginPage button {
+    width: 100%;
+    background: #007bff;
+    color: white;
+    padding: 12px;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  #loginError {
+    color: red;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  #togglePassword {
+    position: absolute;
+    right: 40px;
+    top: 152px;
+    cursor: pointer;
+    font-size: 18px;
+    user-select: none;
+    color: #666;
+  }
+  #togglePassword:hover {
+    color: #000;
+  }
+  /* PDF export button style */
+  #exportPDFBtn {
+    margin-top: 20px;
+    padding: 12px 20px;
+    font-size: 16px;
+    background: #007bff;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+  }
+  #exportPDFBtn:hover {
+    background: #0056b3;
+  }
+  /* Search Bar */
+  #searchBar {
+    margin-bottom: 15px;
+    padding: 10px;
+    width: 98%;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
